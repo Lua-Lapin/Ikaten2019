@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 var width = window.innerWidth;
 var height = window.innerHeight;
 var x = width/2;
@@ -6,7 +6,7 @@ var y = height/2;
 
 const canvas = document.querySelector('canvas');
 const rendererThree = new THREE.WebGLRenderer({
- canvas: canvas,
+    canvas: canvas,
  // antialias: true,
  // alpha:true
 });
@@ -26,81 +26,129 @@ var light = new THREE.AmbientLight( 0xffffff );
 scene.add( light );
 
 var pic_data;
-var plane;
+var pic1_x=[];
+var plane=[];
+var tail=[];
+var pic2_x=[];
+var texture1=[];
+var texture2=[];
+var loader = new THREE.TextureLoader();
+async function loadTexture1(pida,i) {
+    return new Promise( (res) => {
+        texture1[i] = loader.load(pida.src1,(a)=>{
+            tex1(texture1[i],i);
+            res(a);
+        });
+    });
+}
+async function loadTexture2(pida,i) {
+    return new Promise( (res) => {
+        texture2[i] = loader.load(pida.src2,(a)=>{
+            tex2(texture2[i],i);
+            res(a);
+        });
+    });
+}
+
+async function loop(s,e) {
+    for(var i=s;i<e;i++){
+        await loadTexture1(pic_data[i],i);
+        await loadTexture2(pic_data[i],i);
+    }
+    start(s,e);
+}
+
+var mem_pic;
 $.ajaxSetup({async: false});
 $.getJSON("./pic.json",(data)=>{
     pic_data=data;
+    mem_pic=pic_data.length;
+    loop(0,pic_data.length);
 });
 $.ajaxSetup({async: true});
 
-var pic1_x;
-var texture1 = new THREE.TextureLoader().load(pic_data[0].src1,
-(tex) => {
+function addpic(){
+    $.ajaxSetup({async: false});
+    $.getJSON("./pic.json",(data)=>{
+        var a=mem_pic;
+        pic_data=data;
+        mem_pic=pic_data.length;
+        loop(a,pic_data.length);
+    });
+    $.ajaxSetup({async: true});
+}
+
+function tex1(tex,i){
     var w = tex.image.width;
-    pic1_x=w;
+    pic1_x[i]=w;
     var h = tex.image.height/(tex.image.width/w);
     var geometry = new THREE.PlaneGeometry(1, 1);
-    var material = new THREE.MeshPhongMaterial( { map:texture1 } );
-    plane = new THREE.Mesh( geometry, material );
-    plane.scale.set(w, h, 1);
-    scene.add( plane );
-});
-var plane2;
-var tail=new THREE.Group();
-var pic2_x;
-var texture2 = new THREE.TextureLoader().load(pic_data[0].src2,
-(tex) => {
+    var material = new THREE.MeshPhongMaterial( { map:texture1[i] } );
+    plane[i] = new THREE.Mesh( geometry, material );
+    plane[i].scale.set(w, h, 1);
+    plane[i].position.y+= Math.floor(Math.random()*1200)-600;
+    plane[i].position.x+= Math.floor(Math.random()*4000)-2000;
+    console.log(plane[i].position.y);
+    scene.add( plane[i] );
+}
+
+function tex2(tex,i){
     var w = tex.image.width;
-    pic2_x=w;
+    pic2_x[i]=w;
     var h = tex.image.height/(tex.image.width/w);
     var geometry = new THREE.PlaneGeometry(1, 1);
-    var material = new THREE.MeshPhongMaterial( { map:texture2 } );
-    plane2 = new THREE.Mesh( geometry, material );
+    var material = new THREE.MeshPhongMaterial( { map:texture2[i] } );
+    var plane2 = new THREE.Mesh( geometry, material );
     plane2.scale.set(w, h, 1);
     plane2.position.x-=w/2;
-    tail.add(plane2);
-    tail.position.x-=pic1_x/2;
-    scene.add( tail );
+    console.log(i);
+    tail[i]=new THREE.Group();
+    tail[i].add(plane2);
+    tail[i].position.y+=plane[i].position.y;
+    tail[i].position.x-=pic1_x[i]/2+plane[i].position.x;
+    scene.add( tail[i] );
+}
 
-    start();
-});
-
-var pic_siz_x;
-function start(){
-    pic_siz_x=pic1_x+pic2_x;
-    animate();
+var pic_siz_x=[];
+function start(s,e){
+    for(var i=s;i<e;i++){
+    pic_siz_x[i]=pic1_x[i]+pic2_x[i];
+    }
+    if(s==0){animate();}
 
 }
 var n=1;
 var cou=0;
 function animate(){
     requestAnimationFrame(animate);
-
-    if(tail.rotation.y>=Math.PI/4){
+    for(var i=0;i<pic_data.length;i++){
+    if(tail[i].rotation.y>=Math.PI/4){
         n=-1;
-    }else if(tail.rotation.y<=-Math.PI/4){
+    }else if(tail[i].rotation.y<=-Math.PI/4){
         n=1;
     }
-    tail.rotation.y+=n*Math.PI/180;
+    tail[i].rotation.y+=n*Math.PI/180;
 
-    plane.position.x+=5;
-    plane.position.y+=5*Math.cos(Number(cou+1)/30);
-    if(plane.position.x<-pic_siz_x*2){
-        plane.position.x=width+pic_siz_x;
-    }else if(plane.position.x>width+pic_siz_x/2){
-        plane.position.x=-pic_siz_x*2;
+    plane[i].position.x+=5;
+    plane[i].position.y+=5*Math.cos(Number(i+cou+1)/30);
+    if(plane[i].position.x<-pic_siz_x[i]*4){
+        plane[i].position.x=width+pic_siz_x[i];
+    }else if(plane[i].position.x>width+pic_siz_x[i]/2){
+        plane[i].position.x=-pic_siz_x[i]*4;
     }
 
 
-    movepic();
-
+    movepic(i);
+    }
     cou++;
+
+    addpic();
 
     rendererThree.render(scene,camera);
 }
 
-function movepic(){
-    tail.position.x=plane.position.x-pic1_x/2;
-    tail.position.y=plane.position.y;
-    tail.position.z=plane.position.z;
+function movepic(i){
+    tail[i].position.x=plane[i].position.x-pic1_x[i]/2;
+    tail[i].position.y=plane[i].position.y;
+    tail[i].position.z=plane[i].position.z;
 }

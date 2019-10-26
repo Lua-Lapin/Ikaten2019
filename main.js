@@ -8,8 +8,8 @@ const canvas = document.querySelector('canvas');
 const rendererThree = new THREE.WebGLRenderer({
 	canvas: canvas,
 	transparent: true,
-	// antialias: true,
-	// alpha:true
+	antialias: true,//omotai
+	alpha:true
 });
 rendererThree.setPixelRatio(window.devicePixelRatio);
 rendererThree.setSize(width, height);
@@ -21,6 +21,9 @@ var cam_x = 0;
 var cam_y = 0;
 var cam_z = 1000;
 camera.position.set(cam_x,cam_y,cam_z);
+//var axis = new THREE.AxesHelper((width/height)*cam_z*Math.tan(Math.PI/6));
+//scene.add(axis);//########################################
+//axis.position.z=-1000;
 //camera.lookAt(new THREE.Vector3(0, 0, 0));
 //var controls = new THREE.TrackballControls(camera);
 var light = new THREE.AmbientLight( 0xffffff );
@@ -28,57 +31,42 @@ scene.add( light );
 
 var pic_data;
 var pic1_x=[];
-var fish=[];
-var tail=[];
 var pic2_x=[];
+var pic2_y=[];
+var fish=[];
+var other=[];
 var texture1=[];
 var texture2=[];
 var loader = new THREE.TextureLoader();
 async function loadTexture1(pida,i) {
 	return new Promise( (res) => {
-					texture1[i] = loader.load(pida.src1,(a)=>{
-									tex1(texture1[i],i);
-									res(a);
-					});
+		texture1[i] = loader.load(pida.src,(a)=>{
+			tex1(texture1[i],i);
+			res(a);
+		});
 	});
 }
+
 async function loadTexture2(pida,i) {
 	return new Promise( (res) => {
-		texture2[i] = loader.load(pida.src2,(a)=>{
+		texture2[i] = loader.load(pida.src,(a)=>{
 			tex2(texture2[i],i);
 			res(a);
 		});
 	});
 }
 
-// var loderfont = new THREE.FontLoader();
-// var textGeometry;
-// var text_mas;
-// async function loadfont(){
-//     loderfont.load( './optimer_regular.typeface.json',(font)=>{
-//         textGeometry = new THREE.TextGeometry( '123', {
-//             font: font,
-//             size: 300.0,
-//             height: 5,
-//             curveSegments: 10,
-//             bevelThickness: 3,
-//             bevelSize: 1.0,
-//             bevelEnabled: true
-//         } );
-//         //textGeometry.verticesNeedUpdate =true;
-//         //textGeometry.elementNeedUpdate =true;
-//         //textGeometry.computeFaceNormals();
-//         textGeometry.center();
-//         var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-//         text_mas = new THREE.Mesh( textGeometry, material );
-//         scene.add( text_mas );
-//     } );
-// }
-
+var num1 = 0;
+var num2 = 0;
 async function loop(s,e) {
 	for(var i=s;i<e;i++){
-		await loadTexture1(pic_data[i],i);
-		await loadTexture2(pic_data[i],i);
+		if(pic_data[i].num==1){
+			await loadTexture1(pic_data[i],num1);
+			num1++;
+		}else if(pic_data[i].num==2){
+			await loadTexture2(pic_data[i],num2);
+			num2++;
+		}
 	}
 	start(s,e);
 }
@@ -88,6 +76,7 @@ $.ajaxSetup({async: false});
 $.getJSON("./pic.json",(data)=>{
 	pic_data=data;
 	mem_pic=pic_data.length;
+	console.log(pic_data[0]);
 	loop(0,pic_data.length);
 });
 $.ajaxSetup({async: true});
@@ -103,9 +92,8 @@ function addpic(){
 	$.ajaxSetup({async: true});
 }
 
-var tex_w;
 function tex1(tex,i){
-	tex_w = tex.image.width;
+	var tex_w = tex.image.width;
 	pic1_x[i]=tex_w;
 	var h = tex.image.height/(tex.image.width/tex_w);
 	var geometry = new THREE.PlaneGeometry(1, 1);
@@ -118,65 +106,76 @@ function tex1(tex,i){
 	scene.add( fish[i] );
 }
 
+var oth_wall_x=[];
+var oth_wall_y=[];
+var oth_move_x=[];
+var oth_move_y=[];
 function tex2(tex,i){
-	var w = tex.image.width;
-	pic2_x[i]=w;
-	var h = tex.image.height/(tex.image.width/w);
+	oth_move_x[i]=moverand();
+	oth_move_y[i]=moverand();
+	oth_wall_x[i]=1;//(oth_move_x[i]>=0)?1:-1;
+	oth_wall_y[i]=1;
+	var tex_w = tex.image.width;
+	var tex_h = tex.image.height;
+	pic2_x[i]=tex_w;
+	pic2_y[i]=tex_h;
+	var h = tex.image.height/(tex.image.width/tex_w);
 	var geometry = new THREE.PlaneGeometry(1, 1);
-	var material = new THREE.MeshPhongMaterial( { map:texture2[i],transparent: true } );
-	var plane2 = new THREE.Mesh( geometry, material );
-	plane2.scale.set(w, h, 1);
-	plane2.position.x-=w/2;
-	tail[i]=new THREE.Group();
-	tail[i].add(plane2);
-	tail[i].position.z+=fish[i].position.z;
-	tail[i].position.y+=fish[i].position.y;
-	tail[i].position.x-=pic1_x[i]/2+fish[i].position.x;
-	tail[i].rotation.y=rand(40,-20)*Math.PI/180;
-	scene.add( tail[i] );
+	var material = new THREE.MeshPhongMaterial( { map:texture2[i],transparent: true, side: THREE.DoubleSide } );
+	other[i] = new THREE.Mesh( geometry, material );
+	other[i].scale.set(tex_w, h, 1);
+	other[i].position.z=0;
+	other[i].position.y+= rand(height/2-tex_h*2,-height/2+tex_h*2);//Math.floor(Math.random()*height*2)-height;
+	other[i].position.x+= rand(width/2-tex_w*2,-width/2+tex_w*2);//Math.floor(Math.random()*width*2)-width;
+	scene.add( other[i] );
 }
 
-var pic_siz_x=[];
-async function start(s,e){
-	for(var i=s;i<e;i++){
-		pic_siz_x[i]=pic1_x[i]+pic2_x[i];
+function moverand(){
+	while(true){
+		var a=rand(10,-10);
+		if(a!=0){return a;}
 	}
+}
+
+async function start(s,e){
 	if(s==0){
-		//await loadfont();
 		animate();
 	}
 
 }
-var n=1;
+
 var cou=0;
 function animate(){
 	requestAnimationFrame(animate);
-	for(var i=0;i<pic_data.length;i++){
-	if(tail[i].rotation.y>=Math.PI/4){
-		n=-1;
-	}else if(tail[i].rotation.y<=-Math.PI/4){
-		n=1;
-	}
-	tail[i].rotation.y+=n*Math.PI/180;
-
-	fish[i].position.x+=5;
-	fish[i].position.y+=5*Math.cos(Number(cou+i*10)/30);
-
-	var max_x=(width/2+pic_siz_x[i]*2)+(width/height)*(-fish[i].position.z);
-	var min_x=(-pic_siz_x[i]*2-width/2)-(width/height)*(-fish[i].position.z);
-
-	if(fish[i].position.x<min_x){
-		fish[i].position.x=max_x;
-		fish[i].position.y= Math.floor(Math.random()*height*2)-height;
-		fish[i].position.z=Math.floor(rand(1,-2)*2*tex_w*Math.sin(Math.PI/4));
-	}else if(fish[i].position.x>max_x){
-		fish[i].position.x=min_x;
-		fish[i].position.y= Math.floor(Math.random()*height*2)-height;
-		fish[i].position.z=Math.floor(rand(1,-2)*2*tex_w*Math.sin(Math.PI/4));
+	for(var i=0;i<fish.length;i++){
+		fish[i].position.x+=10;
+		fish[i].position.y+=5*Math.cos(Number(cou+i*10)/30);
+		var mami_x = (width/height)*Math.tan(Math.PI/6)*(1000-fish[i].position.z);
+		var max_x=pic1_x[i]*2+mami_x;
+		var min_x=-pic1_x[i]*2-mami_x;
+		// if(fish[i].position.x<min_x-1){
+		// 	console.log(1);
+		// 	fish[i].position.x=max_x;
+		// 	fish[i].position.y= Math.floor(Math.random()*height*2)-height;
+		// 	fish[i].position.z=Math.floor(rand(1,-2)*2*tex_w*Math.sin(Math.PI/4));
+		// }else 
+		if(fish[i].position.x>max_x+1){
+			fish[i].position.x=min_x;
+			fish[i].position.y= Math.floor(Math.random()*height*2)-height;
+			fish[i].position.z=Math.floor(rand(1,-1)*2*pic1_x[i]*Math.sin(Math.PI/4));
+		}
 	}
 
+	for(var i=0;i<other.length;i++){
+		other[i].position.x+=oth_wall_x[i]*oth_move_x[i];
+		other[i].position.y+=oth_wall_y[i]*oth_move_y[i];
+		var max_x=(width/height)*cam_z*Math.tan(Math.PI/6)-pic2_x[i]/2;
+		var min_x=-(width/height)*cam_z*Math.tan(Math.PI/6)+pic2_x[i]/2;
+		var max_y=(height/width)*cam_z*Math.tan(Math.PI/6)+pic2_y[i];//nannde ugokunn
+		var min_y=-(height/width)*cam_z*Math.tan(Math.PI/6)-pic2_y[i];//nannde ugokunn
 
-	movepic(i);
+		check(i,max_x,min_x,max_y,min_y);
+
 	}
 	cou++;
 
@@ -186,11 +185,19 @@ function animate(){
 	//controls.update();
 }
 
-function movepic(i){
-	tail[i].position.x=fish[i].position.x-pic1_x[i]/2;
-	tail[i].position.y=fish[i].position.y;
-	tail[i].position.z=fish[i].position.z;
+function check(p,max_x,min_x,max_y,min_y){
+	if(other[p].position.x<min_x-1){
+		oth_wall_x[p]=(oth_wall_x[p]==1)?-1:1;
+	}else if(other[p].position.x>max_x+1){
+		oth_wall_x[p]=(oth_wall_x[p]==1)?-1:1;
+	}
+	if(other[p].position.y<min_y-1){
+		oth_wall_y[p]=(oth_wall_y[p]==1)?-1:1;
+	}else if(other[p].position.y>max_y+1){
+		oth_wall_y[p]=(oth_wall_y[p]==1)?-1:1;
+	}
 }
+
 
 function rand(a,b){
 	return Math.floor(Math.random()*(a-b))+b;

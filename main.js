@@ -76,7 +76,6 @@ $.ajaxSetup({async: false});
 $.getJSON("./pic.json",(data)=>{
 	pic_data=data;
 	mem_pic=pic_data.length;
-	console.log(pic_data[0]);
 	loop(0,pic_data.length);
 });
 $.ajaxSetup({async: true});

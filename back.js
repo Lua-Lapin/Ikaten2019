@@ -10,18 +10,32 @@ var renderer = PIXI.autoDetectRenderer(width, height,{
 });
 document.getElementById("pixiview").appendChild(renderer.view);
 
-var pic_back = new PIXI.Graphics();
-pic_back=new PIXI.Sprite(PIXI.Texture.fromImage("pic/b.png"));
-pic_back.anchor.x = 0.5;
-pic_back.anchor.y = 0.5;
-pic_back.x=x;
-pic_back.y=y;
+var pic_back;
+function bc_change(pic){
+    pic_back = new PIXI.Graphics();
+    pic_back=new PIXI.Sprite(PIXI.Texture.fromImage(pic));
+    pic_back.anchor.x = 0.5;
+    pic_back.anchor.y = 0.5;
+    pic_back.x=x;
+    pic_back.y=y;
+    stage.addChild(pic_back);
+}
 
-stage.addChild(pic_back);
+bc_change("pic/b.png");
 
+var cou=0;
 function background(){
     requestAnimationFrame(background);
-
+    cou++;
+    if(cou%1000==0){
+        if((cou/1000)%2==0){
+            pic_back.destroy();
+            bc_change("pic/b.png");
+        }else if((cou/1000)%2==1){
+            pic_back.destroy();
+            bc_change("pic/c.png");
+        }
+    }
     renderer.render(stage);
 }
 

@@ -28,10 +28,10 @@ function background(){
     requestAnimationFrame(background);
     cou++;
     if(cou%1000==0){
-        if((cou/1000)%2==0){
+        if((cou/1000)%2<1){
             pic_back.destroy();
             bc_change("pic/b.png");
-        }else if((cou/1000)%2==1){
+        }else if((cou/1000)%2>=1){
             pic_back.destroy();
             bc_change("pic/c.png");
         }

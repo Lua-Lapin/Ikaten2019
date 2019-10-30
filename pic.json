@@ -1,26 +1,46 @@
-[
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/test2.png","num":1},
-    {"src":"pic/a.png","num":2},
-    {"src":"pic/a.png","num":2},
-    {"src":"pic/a.png","num":2},
-    {"src":"pic/a.png","num":2},
-    {"src":"pic/a.png","num":2}
-]
+[ {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 0
+}, {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 0
+}, {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 0
+}, {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 1
+}, {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 1
+}, {
+  "src" : "pic/test2.png",
+  "num" : 1,
+  "dir" : 1
+}, {
+  "src" : "pic/a.png",
+  "num" : 2
+}, {
+  "src" : "pic/a.png",
+  "num" : 2
+}, {
+  "src" : "pic/a.png",
+  "num" : 2
+}, {
+  "src" : "pic/a.png",
+  "num" : 2
+}, {
+  "src" : "pic/a.png",
+  "num" : 2
+}, {
+  "src" : "pic/2.png",
+  "num" : 1
+}, {
+  "src" : "pic/2.png",
+  "num" : 1
+}]

@@ -12,6 +12,7 @@ document.getElementById("pixiview").appendChild(renderer.view);
 
 var pic_back;
 function bc_change(pic){
+    pic="pic/"+pic;
     pic_back = new PIXI.Graphics();
     pic_back=new PIXI.Sprite(PIXI.Texture.fromImage(pic));
     pic_back.anchor.x = 0.5;
@@ -21,20 +22,21 @@ function bc_change(pic){
     stage.addChild(pic_back);
 }
 
-bc_change("pic/b.png");
+var p="b.png";
+bc_change(p);
 
 var cou=0;
 function background(){
     requestAnimationFrame(background);
     cou++;
+    //console.log(cou);
     if(cou%1000==0){
-        if((cou/1000)%2<1){
-            pic_back.destroy();
-            bc_change("pic/b.png");
-        }else if((cou/1000)%2>=1){
-            pic_back.destroy();
-            bc_change("pic/c.png");
+        pic_back.destroy();
+        switch(p){
+            case "b.png":p="c.png";break;
+            case "c.png":p="b.png";break;
         }
+        bc_change(p);
     }
     renderer.render(stage);
 }

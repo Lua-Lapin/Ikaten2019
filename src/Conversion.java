@@ -19,22 +19,6 @@ public class Conversion extends Component {
     private BufferedImage iimg;
     private int z=220;
 
-//    public boolean writeImage(String path) {
-//        try{
-//            BufferedImage image=ImageIO.read(new File(path+".png"));
-//            int w = image.getWidth();
-//            int h = image.getHeight();
-////            BufferedImage out=transparent(trimming(image,w,h));
-//            String oFilename = path+".png";
-//            ImageIO.write(image,"png",new File(oFilename));
-//            System.out.println("Process Succesed");
-//            return true;
-//        }catch (Exception e) {
-//            System.out.println("image file write error.");
-//            return false;
-//        }
-//    }
-
     public BufferedImage doArufa(BufferedImage image,int max){
         iimg=image;
         for(int i=0;i<max;i++){

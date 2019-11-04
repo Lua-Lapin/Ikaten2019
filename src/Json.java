@@ -69,7 +69,7 @@ public class Json {
             if(node.size()==2){
                 out[i++]=node.get("src").asText()+" : "+node.get("num").asText();
             }else{
-                out[i++]=node.get("src").asText()+" : "+node.get("num").asText() +" : "+node.get("num").asText();
+                out[i++]=node.get("src").asText()+" : "+node.get("num").asText() +" : "+node.get("dir").asText();
             }
 
         }

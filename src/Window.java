@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class Window extends JFrame {
     //TO DO ファイルの場所指定
@@ -28,16 +29,13 @@ public class Window extends JFrame {
     private JPanel p6;
     private JLabel l0;
     private JLabel jl;
-    private ImageIcon icon;
     private JTextField area0;
     private JTextField area1;
     private JTextField area2;
-    private JTextField area3;
     private JButton conB;
     private JButton addB;
     private JButton loadB;
     private JButton removeB;
-    private JButton adjustmentB;
     private JComboBox<String> combo;
     DefaultComboBoxModel model;
 
@@ -72,11 +70,11 @@ public class Window extends JFrame {
         p1.setLayout(new BoxLayout(p1, BoxLayout.LINE_AXIS));
         p2.setLayout(new BoxLayout(p2, BoxLayout.LINE_AXIS));
         p3.setLayout(new BoxLayout(p3, BoxLayout.LINE_AXIS));
+        p6.setLayout(new BoxLayout(p6, BoxLayout.LINE_AXIS));
 
         area0 = new JTextField("",30);
         area1 = new JTextField("");
-        area2 = new JTextField("1");
-        area3 = new JTextField("-1");
+        area2 = new JTextField("");
         model = new DefaultComboBoxModel();
         combo = new JComboBox<>(model);
         conB = new JButton("get");
@@ -110,44 +108,38 @@ public class Window extends JFrame {
         p1.add(area0);
         p1.add(loadB);
         p2.add(area1);
-        p2.add(area2);
-        p2.add(area3);
         p2.add(conB);
-        p2.add(addB);
         p3.add(combo);
         p3.add(removeB);
-        p4.add(jl);
-        p5.add(l0);
+//        p4.add(jl);
+//        p5.add(l0);
+        p6.add(area2);
+        p6.add(addB);
+
+        getRootPane().setDefaultButton(conB);
 
         p0.add(p1);
         p0.add(p2);
         p0.add(p3);
-        p0.add(p4);
-        p0.add(p5);
+//        p0.add(p4);
+//        p0.add(p5);
+        p0.add(p6);
         getContentPane().add(p0, BorderLayout.NORTH);
         repaint();
     }
 
     private void conBEve(){
-//        BufferedImage image= null;
         PdfToPng p2p = new PdfToPng(area0.getText());
         p2p.conversion(area1.getText());
-//        try {
-//            image = ImageIO.read(new File(area0.getText()+"\\pic\\"+area1.getText()+"_0.png"));
-//            if(con.writeImage(area0.getText()+"\\pic",area1.getText(),image)){
-//                jl.setText(area0.getText()+"\\pic\\"+area1.getText()+".png");
-//            }
-//        } catch (IOException e) {
-//            System.out.println("404:not found");
-//            System.out.println(area0.getText()+"\\pic\\"+area1.getText()+"_0.png");
-//        }
-        PreWindow previwe = new PreWindow(area0.getText()+"\\pic\\"+area1.getText());
+        PreWindow previwe = new PreWindow(area0.getText()+"\\pic\\"+area1.getText(),area0.getText(),area1.getText());
         repaint();
+        area1.setText(""+(Integer.valueOf(area1.getText())+1));
     }
 
     private void addBEve(){
+        Random rand = new Random();
         json.reload();
-        json.addAnode("pic/"+area1.getText()+".png",Integer.valueOf(area2.getText()),Integer.valueOf(area3.getText()));
+        json.addAnode("pic/"+area2.getText()+".png",rand.nextInt(2)+1,rand.nextInt(2));
         json.outputJsonFile();
         reloadCombo();
     }
@@ -155,7 +147,7 @@ public class Window extends JFrame {
         System.out.println(area0.getText());
         json.setPath(area0.getText());
         json.reload();
-        addCombo();
+        reloadCombo();
     }
     private void removeBEve(){
         json.reload();

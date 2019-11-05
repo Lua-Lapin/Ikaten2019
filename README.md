@@ -19,7 +19,7 @@ jsonファイルを書き換えると自動的に描写されます
 canvasの体裁を整えるもの。
 ### pic.json
 pictureが入るもの。
-### その他外部ファイル
+### 使用ライブラリ
 - jquery-3.3.1.min.js
 - pixi.min.js
 - three.min.js

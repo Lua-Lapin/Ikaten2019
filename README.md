@@ -8,5 +8,15 @@ jsonファイルを書き換えると自動的に描写されます
 | num | 種類 | 1:魚,2:浮遊 |
 | dir | 向き | 0:右,1:左 |
 
+## 表示部分
+### index.html
+### index.js
+### back.js
+### main.css
+### pic.json
+### その他外部ファイル
+- jquery-3.3.1.min.js
+- pixi.min.js
+- three.min.js
 ## java
 外部APIが足りてないので動かすときはJacksonとSpire.pdfを入れてから動かしてください
